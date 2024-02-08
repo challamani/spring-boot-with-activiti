@@ -23,14 +23,13 @@ You can start the app using mvn command `mvn spring-boot:run`
 ![Image](src/main/resources/img/order-process-bpmn.png)
 
 
-### 1. Start and complete the process only with service-tasks
+### Start and complete the process only with service-tasks
 
 *Start the order process flow with item quantity less than 5, the process should complete fully.*
 ```shell
-curl --location 'http://localhost:9090/activiti/start' --header 'Content-Type: application/json' \
+curl --location 'http://localhost:9090/activiti/start/orderProcess' --header 'Content-Type: application/json' \
 --data '{
-	"processDefinitionKey":"orderProcess",
-    "order":{
+	"order":{
         "id":"OR89002",
         "status":"initiated",
         "orderItems":[
@@ -46,9 +45,25 @@ curl --location 'http://localhost:9090/activiti/start' --header 'Content-Type: a
 }'
 ```
 
-### 2. Start and complete the process instance with a service-tasks and user-task.
+*Response*
+```json
+{
+    "id": "dc933adb-c6c4-11ee-bf73-964cf6ae4bd3",
+    "name": "Process starting for the order# : OR89001",
+    "processDefinitionId": "orderProcess:1:ccce0f29-c6c4-11ee-bf73-964cf6ae4bd3",
+    "processDefinitionKey": "orderProcess",
+    "initiator": "system",
+    "startDate": "2024-02-08T20:58:51.164+00:00",
+    "businessKey": "businessKey009",
+    "status": "COMPLETED",
+    "processDefinitionVersion": 1,
+    "processDefinitionName": "orderProcess"
+}
+```
 
-*Start the order process flow with item quantity greater than 5, the process should wait at user-task.*
+### Start and complete the process instance with a service-task and user-task.
+
+*1. Start the order process flow with item quantity greater than 5, the process should wait at user-task.*
 ```shell
 curl --location 'http://localhost:9090/activiti/start' --header 'Content-Type: application/json' \
 --data '{
@@ -69,12 +84,44 @@ curl --location 'http://localhost:9090/activiti/start' --header 'Content-Type: a
 }'
 ```
 
-*Get active userTasks list*
+*Response*
+```json
+{
+    "id": "f0823a17-c6c4-11ee-bf73-964cf6ae4bd3",
+    "name": "Process starting for the order# : OR89005",
+    "processDefinitionId": "orderProcess:1:ccce0f29-c6c4-11ee-bf73-964cf6ae4bd3",
+    "processDefinitionKey": "orderProcess",
+    "initiator": "system",
+    "startDate": "2024-02-08T20:59:24.605+00:00",
+    "businessKey": "businessKey009",
+    "status": "RUNNING",
+    "processDefinitionVersion": 1,
+    "processDefinitionName": "orderProcess"
+}
+```
+
+*2. Get active userTasks list*
 ```curl
 curl --location --request GET 'http://localhost:9090/activiti/tasks
 ```
 
-*Complete the userTask*
+*Response:*
+```json
+[
+    "d4796866-c6c4-11ee-bf73-964cf6ae4bd3",
+    "f08399b2-c6c4-11ee-bf73-964cf6ae4bd3"
+]
+```
+
+*3. Complete the userTask*
 ```curl
-curl --location --request PUT 'http://localhost:9090/activiti/tasks/c66e9ea0-c6c1-11ee-a049-02b5cad86a21'
+curl --location --request PUT 'http://localhost:9090/activiti/tasks/d4796866-c6c4-11ee-bf73-964cf6ae4bd3'
+```
+
+*Response:*
+```json
+{
+    "userTaskId": "d4796866-c6c4-11ee-bf73-964cf6ae4bd3",
+    "status": "COMPLETED"
+}
 ```
