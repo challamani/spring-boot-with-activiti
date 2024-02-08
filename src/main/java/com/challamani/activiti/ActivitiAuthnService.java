@@ -27,6 +27,7 @@ public class ActivitiAuthnService {
         if (Objects.isNull(user)) {
             throw new IllegalStateException("User " + username + " doesn't exist, please provide a valid user");
         }
+
         log.info("> Logged in as: {}", username);
         SecurityContextHolder.setContext(new SecurityContextImpl(new Authentication() {
             @Override

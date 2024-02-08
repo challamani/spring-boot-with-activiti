@@ -1,13 +1,13 @@
 {
-  "id":"categorizeProcessModel",
+  "id":"orderProcessModel",
   "type": "PROCESS",
   "name": "process",
   "extensions": {
-    "categorizeProcess": {
+    "orderProcess": {
       "properties": {
         "557dfb49-456b-492d-b99c-0a49ee325e77": {
           "id": "557dfb49-456b-492d-b99c-0a49ee325e77",
-          "name": "content",
+          "name": "orderStatus",
           "type": "string",
           "required": true
         }
