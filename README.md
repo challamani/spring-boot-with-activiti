@@ -23,7 +23,7 @@ You can start the app using mvn command `mvn spring-boot:run`
 ![Image](src/main/resources/img/order-process-bpmn.png)
 
 
-### 1. Complete the initiated process only with service-tasks
+### 1. Start and complete the process only with service-tasks
 
 *Start the order process flow with item quantity less than 5, the process should complete fully.*
 ```shell
@@ -46,7 +46,7 @@ curl --location 'http://localhost:9090/activiti/start' --header 'Content-Type: a
 }'
 ```
 
-### 2. Complete the initiated process with a service-tasks and user-task.
+### 2. Start and complete the process instance with a service-tasks and user-task.
 
 *Start the order process flow with item quantity greater than 5, the process should wait at user-task.*
 ```shell
