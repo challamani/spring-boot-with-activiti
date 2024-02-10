@@ -28,32 +28,25 @@ public class UserTaskService {
                 .collect(Collectors.toList());
     }
 
-    public UserTask updateUserTask(String taskId, Map<String, Object> variables){
+    public UserTask updateUserTask(String taskId, Map<String, Object> variables) {
 
         activitiAuthnService.authenticate("system");
-
-        String userTaskId = taskService.createTaskQuery()
-                .active().taskId(taskId)
-                .list().stream().map(task -> task.getId())
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("invalid userTask#"+taskId));
-
-        log.info("incoming variables {}", variables);
-        //Completing the userTask with incoming variables
-        taskService.complete(userTaskId,variables);
-
-        //query to history table to extract details
-        return taskService.createTaskQuery()
+        UserTask userTask = taskService.createTaskQuery()
                 .taskId(taskId).list().stream()
                 .map(task -> createUserTaskInfo(task))
                 .findFirst()
-                .orElseThrow(()->new RuntimeException("failed at updateUserTask:"+userTaskId));
+                .orElseThrow(() -> new RuntimeException("failed at updateUserTask:" + taskId));
+        userTask.setLocalVariables(variables);
+
+        //Completing the userTask with incoming variables
+        taskService.complete(taskId, variables);
+        return userTask;
     }
 
     private UserTask createUserTaskInfo(Task task) {
         UserTask userTask = new UserTask();
+
         userTask.setId(task.getId());
-        log.info("populating user task details {}", task.getId());
         userTask.setDescription(task.getDescription());
         userTask.setOwner(task.getOwner());
         userTask.setProcessInstanceId(task.getProcessInstanceId());
@@ -63,7 +56,7 @@ public class UserTaskService {
         userTask.setName(task.getName());
 
         Map<String, Object> localVariables = new HashMap<>();
-        task.getTaskLocalVariables().forEach(
+        task.getProcessVariables().forEach(
                 (key, value) -> localVariables.put(key, value)
         );
         userTask.setLocalVariables(localVariables);
