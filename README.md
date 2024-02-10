@@ -108,8 +108,20 @@ curl --location --request GET 'http://localhost:9090/activiti/tasks
 *Response:*
 ```json
 [
-    "d4796866-c6c4-11ee-bf73-964cf6ae4bd3",
-    "f08399b2-c6c4-11ee-bf73-964cf6ae4bd3"
+  {
+    "id": "8ec20658-c816-11ee-9fea-dac69f7d3eaf",
+    "parentProcessId": "8ec0cdcd-c816-11ee-9fea-dac69f7d3eaf",
+    "businessKey": "businessKey007",
+    "name": "Verify the order details",
+    "createTime": "2024-02-10T13:16:10.498+00:00"
+  },
+  {
+    "id": "8f17ee98-c816-11ee-9fea-dac69f7d3eaf",
+    "parentProcessId": "8f16dd1d-c816-11ee-9fea-dac69f7d3eaf",
+    "businessKey": "businessKey008",
+    "name": "Verify the order details",
+    "createTime": "2024-02-10T13:16:11.060+00:00"
+  }
 ]
 ```
 

@@ -2,20 +2,16 @@ package com.challamani.activiti.controller;
 
 import com.challamani.activiti.ActivitiAuthnService;
 import com.challamani.activiti.model.OrderProcessRequest;
+import com.challamani.activiti.model.UserTask;
+import com.challamani.activiti.service.UserTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.api.process.model.ProcessInstance;
 import org.activiti.api.process.model.builders.ProcessPayloadBuilder;
 import org.activiti.api.process.runtime.ProcessRuntime;
-
-import org.activiti.engine.TaskService;
-import org.activiti.engine.task.Task;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,8 +19,8 @@ import java.util.stream.Collectors;
 public class ActivitiProcessController {
 
     private final ProcessRuntime processRuntime;
-    private final TaskService taskService;
     private final ActivitiAuthnService activitiAuthnService;
+    private final UserTaskService userTaskService;
 
     @PostMapping(value = "/start/{processDefinitionKey}")
     public ProcessInstance startProcess(@RequestBody OrderProcessRequest orderProcessRequest,
@@ -51,25 +47,13 @@ public class ActivitiProcessController {
     }
 
     @GetMapping(value = "/tasks")
-    public List<String>  getTasks() {
-        return taskService.createTaskQuery().active()
-                .list().stream()
-                .map(task -> task.getId()).collect(Collectors.toList());
+    public List<UserTask>  getTasks() {
+        return userTaskService.getActiveUserTasks();
     }
 
     @PutMapping(value = "/tasks/{taskId}")
-    public Map<String, String> updateTask(@PathVariable String taskId) {
-        activitiAuthnService.authenticate("system");
-
-        String userTaskId = taskService.createTaskQuery().taskId(taskId)
-                .list().stream().map(task -> task.getId())
-                .collect(Collectors.toList()).get(0);
-
-        taskService.complete(userTaskId,
-                Map.of("orderStatus", "COMPLETED",
-                        "manualVerification", "COMPLETED",
-                        "note", "Nothing suspicious"));
-
-        return Map.of("userTaskId", userTaskId, "status", "COMPLETED");
+    public UserTask updateTask(@PathVariable String taskId,
+                               @RequestBody Map<String, Object> variables) {
+        return userTaskService.updateUserTask(taskId,variables);
     }
 }
