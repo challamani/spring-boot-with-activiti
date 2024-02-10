@@ -1,12 +1,14 @@
 # spring-boot-with-activiti
 Activiti is an Apache-licensed BPM engine, which we can use to define the process, a process can consist of a set of human tasks and service tasks.
 
-Some features are:
-* BPMN Support 
-* Sub-processing
-* Rest engine
-* Retry feature for the service tasks 
-* Auditing 
+Activiti provides the following features:
+* BPMN2.0 Support 
+  * Sub-processing
+  * Rest API engine
+  * Retry feature for the service tasks 
+  * Async service task handling
+  * User task handling
+  * Activity Auditing 
 
 This repo is to explore some features of Activiti, 
 
