@@ -42,9 +42,12 @@ public class UserTaskService {
         //Completing the userTask with incoming variables
         taskService.complete(userTaskId,variables);
 
-        return taskService.createTaskQuery().list().stream()
+        //query to history table to extract details
+        return taskService.createTaskQuery()
+                .taskId(taskId).list().stream()
                 .map(task -> createUserTaskInfo(task))
-                .findFirst().orElseThrow(()->new RuntimeException("failed at updateUserTask:"+userTaskId));
+                .findFirst()
+                .orElseThrow(()->new RuntimeException("failed at updateUserTask:"+userTaskId));
     }
 
     private UserTask createUserTaskInfo(Task task) {
