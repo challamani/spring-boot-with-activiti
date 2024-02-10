@@ -1,6 +1,9 @@
 package com.challamani.activiti;
 
 import com.challamani.activiti.model.Item;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.api.process.runtime.connector.Connector;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -24,16 +28,25 @@ public class SampleActivitiApplication {
     public static void main(String[] args) {
         SpringApplication.run(SampleActivitiApplication.class, args);
     }
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     @Bean
-    public Connector processOrderConnector() {
+    public Connector processOrderConnector()  {
 
         return integrationContext -> {
 
-            Map<String, Object> inBoundVariables = integrationContext.getInBoundVariables();
-            String orderId = (String) inBoundVariables.get("orderId");
-            String orderStatus = (String) inBoundVariables.get("orderStatus");
+            String orderId = integrationContext.getInBoundVariable("orderId", String.class);
+            String orderStatus = integrationContext.getInBoundVariable("orderStatus", String.class);
 
-            List<Item> orderItems = (List<Item>) inBoundVariables.get("orderItems");
+            List<Item> orderItems = null;
+            try {
+                String orderItemsStr = OBJECT_MAPPER.writeValueAsString(integrationContext.getInBoundVariable("orderItems"));
+                log.info("order items {}",orderItemsStr);
+                orderItems = OBJECT_MAPPER.readValue(orderItemsStr, new TypeReference<ArrayList<Item>>() {
+                });
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
             log.info("order {} status {}", orderId, orderStatus);
             boolean isItemQuantityExceeding = orderItems.stream().anyMatch(item -> item.getQuantity() > 5);
@@ -62,9 +75,11 @@ public class SampleActivitiApplication {
             String orderStatus = (String) inBoundVariables.get("orderStatus");
             log.info("< packageServiceConnector order {} status {}", orderId, orderStatus);
             if(orderStatus.equalsIgnoreCase("CONFIRMED")){
-                orderStatus = "PROCESSED";
+                log.info("packing is completed for the order {}", orderId);
+                orderStatus = "ReadyToShip";
             }else{
-                orderStatus = "PREPARING";
+                log.info("unexpected order {} has arrived to packing section", orderId);
+                orderStatus = "PENDING";
             }
             integrationContext.addOutBoundVariable("orderStatus", orderStatus);
             log.info("< packageServiceConnector order {} status {}", orderId, orderStatus);

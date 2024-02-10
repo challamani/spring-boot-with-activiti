@@ -38,6 +38,7 @@ public class UserTaskService {
                 .orElseThrow(() -> new RuntimeException("failed at updateUserTask:" + taskId));
         userTask.setLocalVariables(variables);
 
+        log.info("user task inbound variables {}",variables);
         //Completing the userTask with incoming variables
         taskService.complete(taskId, variables);
         return userTask;
