@@ -42,7 +42,7 @@ public class UserTaskService {
         //Completing the userTask with incoming variables
         taskService.complete(userTaskId,variables);
 
-        return taskService.createTaskQuery()..list().stream()
+        return taskService.createTaskQuery().list().stream()
                 .map(task -> createUserTaskInfo(task))
                 .findFirst().orElseThrow(()->new RuntimeException("failed at updateUserTask:"+userTaskId));
     }
